@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kshamata-Setu | Integration Readiness Centre</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            gov: { 800: '#0f2942', 900: '#0a1d30' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col font-sans">
+
+  <!-- Header -->
+  <header class="bg-gov-900 text-white border-b-4 border-emerald-500 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="bg-emerald-600 text-white font-black text-2xl w-10 h-10 rounded-lg flex items-center justify-center shadow">
+          KS
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-xl font-bold tracking-tight">KSHAMATA-SETU</h1>
+            <span class="text-xs bg-emerald-700/80 px-2 py-0.5 rounded font-mono">SIH26135</span>
+            <span class="text-xs bg-amber-500/90 text-gov-900 px-2 py-0.5 rounded font-bold">HexaCore</span>
+          </div>
+          <p class="text-xs text-slate-300">Statutory Registry Integration Readiness Centre & Gateway Status Matrix</p>
+        </div>
+      </div>
+      <nav class="flex items-center space-x-2 text-sm font-medium">
+        <a href="/" class="px-3 py-1.5 rounded-md text-slate-200 hover:bg-slate-800 transition">Live Simulator</a>
+        <a href="/dashboard" class="px-3 py-1.5 rounded-md text-slate-200 hover:bg-slate-800 transition">Analytics Dashboard</a>
+        <a href="/integrations-ui" class="px-3 py-1.5 rounded-md bg-emerald-600 text-white shadow">Integration Readiness</a>
+        <a href="/docs" target="_blank" class="px-3 py-1.5 rounded-md text-slate-200 hover:bg-slate-800 transition">Swagger API</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Truth Banner -->
+  <div class="bg-amber-50 border-b border-amber-200 text-amber-900 text-xs px-4 py-2 font-medium">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <span class="inline-block w-2 h-2 rounded-full bg-amber-500"></span>
+        <span><strong>PROTOTYPE TRUTH BOUNDARY:</strong> All external government registries are transparently declared with statutory licensing prerequisites.</span>
+      </div>
+      <span class="text-amber-800 font-semibold">Zero Fraudulent Live Claims • Honest Architecture</span>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-6">
+
+    <!-- Judge Credibility Callout Card -->
+    <div class="bg-gradient-to-r from-gov-900 to-slate-900 text-white rounded-xl p-6 shadow-md border border-slate-700">
+      <div class="flex items-start space-x-4">
+        <div class="bg-emerald-500/20 text-emerald-400 p-3 rounded-lg border border-emerald-500/30">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <div class="space-y-1.5 flex-1">
+          <h2 class="text-lg font-bold text-white">Why This Page Establishes National-Finale Credibility</h2>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Many hackathon teams falsely claim live integration with UIDAI (Aadhaar), EPFO, or GSTN. In reality, accessing these national registries requires statutory <strong>AUA/KUA licensing, Security Operations Centre (SOC-2) audits, and inter-ministerial MOUs</strong> that cannot legally be obtained for a prototype.
+          </p>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            <strong>HexaCore's Architectural Approach:</strong> We provide real, working Phone-OTP and two-sided employer validation in this build, while displaying this active Registry Gateway Matrix with mapped schemas, sandbox adapters, and explicit production prerequisites for day-one government deployment.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex flex-wrap gap-2 text-xs font-semibold" id="filter_buttons">
+        <button onclick="filterIntegrations('ALL')" class="filter-btn active bg-slate-800 text-white px-3 py-1.5 rounded-lg shadow-sm">All Integrations (11)</button>
+        <button onclick="filterIntegrations('Communication')" class="filter-btn bg-white hover:bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg border border-slate-200">Communication (2)</button>
+        <button onclick="filterIntegrations('Identity')" class="filter-btn bg-white hover:bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg border border-slate-200">Identity & Credentials (2)</button>
+        <button onclick="filterIntegrations('Employment Verification')" class="filter-btn bg-white hover:bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg border border-slate-200">Employment Verification (4)</button>
+        <button onclick="filterIntegrations('Skilling Registry')" class="filter-btn bg-white hover:bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg border border-slate-200">Skilling Portals (3)</button>
+      </div>
+      <span class="text-xs text-slate-500 font-mono" id="last_sync_label">Loaded from GET /integrations</span>
+    </div>
+
+    <!-- Integrations Grid -->
+    <div id="integrations_grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div class="col-span-full py-12 text-center text-slate-400 text-sm">Loading statutory integration matrix...</div>
+    </div>
+
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    Kshamata-Setu • SIH26135 • Team HexaCore • Maharashtra State Innovation Society
+  </footer>
+
+  <script>
+    let allIntegrations = [];
+
+    async function fetchIntegrations() {
+      try {
+        const res = await fetch('/integrations');
+        allIntegrations = await res.json();
+        renderGrid(allIntegrations);
+      } catch (err) {
+        console.error('Integrations error:', err);
+      }
+    }
+
+    function renderGrid(items) {
+      const grid = document.getElementById('integrations_grid');
+      if (!items.length) {
+        grid.innerHTML = '<div class="col-span-full text-center text-slate-400 py-8">No integrations in this category.</div>';
+        return;
+      }
+
+      grid.innerHTML = items.map(item => {
+        let badgeClass = '';
+        let badgeText = '';
+
+        if (item.status === 'MOCK_ACTIVE') {
+          badgeClass = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+          badgeText = 'Mock Active in Demo';
+        } else if (item.status === 'ADAPTER_READY') {
+          badgeClass = 'bg-blue-100 text-blue-800 border-blue-200';
+          badgeText = 'Adapter Ready';
+        } else {
+          badgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
+          badgeText = 'Authorization Required';
+        }
+
+        return `
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col justify-between hover:shadow-md transition">
+            <div>
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">${item.category}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeClass}">
+                  ${badgeText}
+                </span>
+              </div>
+              <h3 class="text-sm font-bold text-gov-900 mb-2 leading-tight">${item.name}</h3>
+              <div class="bg-slate-50 p-2.5 rounded border border-slate-100 text-xs text-slate-600 mb-3">
+                <span class="font-semibold text-slate-700 block mb-0.5">Production Prerequisite:</span>
+                ${item.production_prerequisites}
+              </div>
+            </div>
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+              <span>Status: ${item.status}</span>
+              <span>Tested: ${item.last_tested.substring(11, 19)} UTC</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterIntegrations(cat) {
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('bg-slate-800', 'text-white');
+        btn.classList.add('bg-white', 'text-slate-700');
+      });
+      event.currentTarget.classList.remove('bg-white', 'text-slate-700');
+      event.currentTarget.classList.add('bg-slate-800', 'text-white');
+
+      if (cat === 'ALL') {
+        renderGrid(allIntegrations);
+      } else {
+        const filtered = allIntegrations.filter(i => i.category.toLowerCase().includes(cat.toLowerCase()));
+        renderGrid(filtered);
+      }
+    }
+
+    window.onload = fetchIntegrations;
+  </script>
+</body>
+</html>

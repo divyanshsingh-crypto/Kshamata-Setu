@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kshamata-Setu | Audit-Safe Employer Confirmation</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            gov: { 800: '#0f2942', 900: '#0a1d30' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col font-sans">
+
+  <!-- Minimal Institutional Header -->
+  <header class="bg-gov-900 text-white border-b-4 border-emerald-500 shadow-md">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-emerald-600 text-white font-black text-xl w-9 h-9 rounded flex items-center justify-center">
+          KS
+        </div>
+        <div>
+          <h1 class="text-base font-bold">KSHAMATA-SETU OUTCOME AUDIT PORTAL</h1>
+          <p class="text-[11px] text-slate-300">Maharashtra State Innovation Society • Two-Sided Employment Verification Gateway</p>
+        </div>
+      </div>
+      <span class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded font-mono">Tier E3 Gateway</span>
+    </div>
+  </header>
+
+  <main class="max-w-xl mx-auto px-4 py-8 flex-1 w-full flex flex-col justify-center">
+
+    <div class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
+      
+      <!-- Card Header -->
+      <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+        <div>
+          <h2 class="text-base font-bold text-slate-800">Employment Verification Request</h2>
+          <p class="text-xs text-slate-500">Official cross-verification for state-sponsored skill certification outcome.</p>
+        </div>
+        <span id="audit_badge" class="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-200 text-slate-700">
+          Loading...
+        </span>
+      </div>
+
+      <!-- Token Input (if not in URL query) -->
+      <div id="token_input_box" class="p-6 border-b border-slate-100 hidden bg-amber-50">
+        <label class="block text-xs font-bold text-amber-900 mb-1">Enter Verification Token</label>
+        <div class="flex gap-2">
+          <input type="text" id="manual_token" placeholder="Paste verification token" class="flex-1 text-xs border rounded p-2 bg-white">
+          <button onclick="loadTokenDetails(document.getElementById('manual_token').value)" class="bg-gov-900 text-white text-xs font-semibold px-4 py-2 rounded">
+            Lookup
+          </button>
+        </div>
+      </div>
+
+      <!-- Trainee Claim Details -->
+      <div class="p-6 space-y-4">
+        
+        <div class="bg-slate-50 rounded-lg p-4 border border-slate-200 space-y-3">
+          <div class="flex justify-between items-center text-xs pb-2 border-b border-slate-200">
+            <span class="text-slate-500">Trainee Name:</span>
+            <span id="val_trainee_name" class="font-bold text-slate-800 text-sm">--</span>
+          </div>
+          <div class="flex justify-between items-center text-xs pb-2 border-b border-slate-200">
+            <span class="text-slate-500">Certified Course:</span>
+            <span id="val_course_name" class="font-semibold text-slate-800">--</span>
+          </div>
+          <div class="flex justify-between items-center text-xs pb-2 border-b border-slate-200">
+            <span class="text-slate-500">Reported Employer:</span>
+            <span id="val_employer" class="font-bold text-emerald-700 text-sm">--</span>
+          </div>
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-slate-500">Verification Token:</span>
+            <span id="val_token" class="font-mono text-slate-600 truncate max-w-[200px]">--</span>
+          </div>
+        </div>
+
+        <!-- Prompt Text -->
+        <p class="text-xs text-slate-600 leading-relaxed">
+          Does the candidate named above currently work, or has completed placement employment at your enterprise as declared? Your response is permanently recorded in the state audit ledger.
+        </p>
+
+        <!-- Notification Banner -->
+        <div id="status_alert" class="hidden p-3 rounded-lg text-xs font-medium"></div>
+
+        <!-- Action Buttons -->
+        <div id="action_buttons" class="grid grid-cols-2 gap-3 pt-2">
+          <button onclick="submitConfirmation(true)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2.5 rounded shadow transition flex items-center justify-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            Confirm Placement (Tier E3)
+          </button>
+          <button onclick="submitConfirmation(false)" class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-2.5 rounded shadow transition flex items-center justify-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            Reject Claim / Dispute
+          </button>
+        </div>
+
+        <!-- Test Re-submission Button for Judges -->
+        <div class="pt-4 border-t border-slate-100 flex justify-between items-center text-[11px] text-slate-500">
+          <span>Audit Integrity Rule: Resubmission is strictly locked.</span>
+          <button onclick="testResubmitFlip()" class="text-rose-600 hover:underline font-medium">
+            Test Re-Submission (Verify 409 Lock)
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="text-center py-4 text-xs text-slate-400">
+    Kshamata-Setu • Two-Sided Audit Verification • Team HexaCore
+  </footer>
+
+  <script>
+    let currentToken = null;
+    let isAlreadyConfirmed = false;
+
+    function getParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    async function loadTokenDetails(token) {
+      if (!token) {
+        document.getElementById('token_input_box').classList.remove('hidden');
+        document.getElementById('audit_badge').innerText = 'Awaiting Token';
+        return;
+      }
+      currentToken = token;
+
+      try {
+        const res = await fetch(`/employer/confirm/${token}`);
+        const data = await res.json();
+        
+        if (res.ok) {
+          document.getElementById('token_input_box').classList.add('hidden');
+          document.getElementById('val_trainee_name').innerText = data.trainee_name;
+          document.getElementById('val_course_name').innerText = data.course_name;
+          document.getElementById('val_employer').innerText = data.claimed_employer;
+          document.getElementById('val_token').innerText = data.token;
+
+          isAlreadyConfirmed = data.already_confirmed;
+          const badge = document.getElementById('audit_badge');
+          
+          if (data.status === 'CONFIRMED') {
+            badge.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800';
+            badge.innerText = 'Tier E3 Confirmed';
+            showNotice('Already Verified: This placement was officially confirmed.', 'emerald');
+          } else if (data.status === 'REJECTED') {
+            badge.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-rose-100 text-rose-800';
+            badge.innerText = 'Disputed / Rejected';
+            showNotice('Already Recorded: This claim was reported as disputed.', 'rose');
+          } else {
+            badge.className = 'text-xs font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800';
+            badge.innerText = 'Pending Verification';
+          }
+        } else {
+          showNotice(`Lookup Failed (${res.status}): ${data.detail}`, 'rose');
+          document.getElementById('token_input_box').classList.remove('hidden');
+        }
+      } catch (err) {
+        showNotice(`Network error: ${err}`, 'rose');
+      }
+    }
+
+    function showNotice(msg, color) {
+      const el = document.getElementById('status_alert');
+      el.className = `p-3 rounded-lg text-xs font-medium ${color === 'emerald' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200'}`;
+      el.innerText = msg;
+      el.classList.remove('hidden');
+    }
+
+    async function submitConfirmation(confirmed) {
+      if (!currentToken) return alert('No valid token loaded.');
+
+      try {
+        const res = await fetch('/employer/confirm', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            token: currentToken,
+            confirmed: confirmed
+          })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          showNotice(`SUCCESS: ${data.message} Result: ${data.result}`, 'emerald');
+          loadTokenDetails(currentToken);
+        } else if (res.status === 409) {
+          showNotice(`409 CONFLICT DETECTED: ${data.detail}`, 'rose');
+        } else {
+          showNotice(`Error (${res.status}): ${data.detail}`, 'rose');
+        }
+      } catch (e) {
+        showNotice(`Network error: ${e}`, 'rose');
+      }
+    }
+
+    function testResubmitFlip() {
+      // Intentionally try to submit opposite response to trigger 409
+      submitConfirmation(false);
+    }
+
+    window.onload = () => {
+      const tok = getParam('token');
+      loadTokenDetails(tok);
+    };
+  </script>
+</body>
+</html>

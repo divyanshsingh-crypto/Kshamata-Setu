@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kshamata-Setu | Executive Analytics Dashboard</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            gov: { 800: '#0f2942', 900: '#0a1d30' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col font-sans">
+
+  <!-- Header -->
+  <header class="bg-gov-900 text-white border-b-4 border-emerald-500 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="bg-emerald-600 text-white font-black text-2xl w-10 h-10 rounded-lg flex items-center justify-center shadow">
+          KS
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-xl font-bold tracking-tight">KSHAMATA-SETU</h1>
+            <span class="text-xs bg-emerald-700/80 px-2 py-0.5 rounded font-mono">SIH26135</span>
+            <span class="text-xs bg-amber-500/90 text-gov-900 px-2 py-0.5 rounded font-bold">HexaCore</span>
+          </div>
+          <p class="text-xs text-slate-300">Executive Decision Support & Trainee Outcome Intelligence Dashboard</p>
+        </div>
+      </div>
+      <nav class="flex items-center space-x-2 text-sm font-medium">
+        <a href="/" class="px-3 py-1.5 rounded-md text-slate-200 hover:bg-slate-800 transition">Live Simulator</a>
+        <a href="/dashboard" class="px-3 py-1.5 rounded-md bg-emerald-600 text-white shadow">Analytics Dashboard</a>
+        <a href="/integrations-ui" class="px-3 py-1.5 rounded-md text-slate-200 hover:bg-slate-800 transition">Integration Readiness</a>
+        <a href="/docs" target="_blank" class="px-3 py-1.5 rounded-md text-slate-200 hover:bg-slate-800 transition">API Docs</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Truth Banner -->
+  <div class="bg-amber-50 border-b border-amber-200 text-amber-900 text-xs px-4 py-2 font-medium">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <span class="inline-block w-2 h-2 rounded-full bg-amber-500"></span>
+        <span><strong>PROTOTYPE MODE:</strong> Synthetic data and mock adapters only. No live government API or real trainee PII is used.</span>
+      </div>
+      <span class="text-amber-800 font-semibold">Tier E0 = Unresolved (Never assumed unemployed)</span>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-6">
+
+    <!-- KPI Summary Row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Trainees Tracked</span>
+        <div class="mt-2 flex items-baseline justify-between">
+          <span id="kpi_total_trainees" class="text-3xl font-extrabold text-gov-900">--</span>
+          <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">100% Salted MSID</span>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Follow-Up Response Rate</span>
+        <div class="mt-2 flex items-baseline justify-between">
+          <span id="kpi_response_rate" class="text-3xl font-extrabold text-blue-700">--%</span>
+          <span id="kpi_responses_sub" class="text-xs text-slate-500">-- responses</span>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Employer-Verified Rate (Tier E3)</span>
+        <div class="mt-2 flex items-baseline justify-between">
+          <span id="kpi_e3_rate" class="text-3xl font-extrabold text-emerald-700">--%</span>
+          <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Audit-Locked</span>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Overall Placement Rate (E1 + E3)</span>
+        <div class="mt-2 flex items-baseline justify-between">
+          <span id="kpi_placement_rate" class="text-3xl font-extrabold text-purple-700">--%</span>
+          <span class="text-xs text-slate-500">of responded</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row 1: Evidence Tiers & Course Performance -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Evidence Tier Breakdown (Core PS Differentiator) -->
+      <div class="lg:col-span-6 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-base font-bold text-slate-800">Granular Evidence-Tier Distribution</h3>
+            <p class="text-xs text-slate-500">Replaces naive binary "placed" boolean with audit-verifiable tiers.</p>
+          </div>
+          <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">E0 vs E1 vs E3</span>
+        </div>
+        <div class="h-64">
+          <canvas id="tierChart"></canvas>
+        </div>
+        <div class="mt-3 text-xs text-slate-500 bg-slate-50 p-2.5 rounded border border-slate-100 flex items-center justify-between">
+          <span>* <strong>E0_NONE:</strong> Pending follow-up response (strictly non-presumptive).</span>
+          <span class="text-emerald-700 font-semibold">• E3: Verified via Employer Audit Token</span>
+        </div>
+      </div>
+
+      <!-- Course Placement & Verification Rates -->
+      <div class="lg:col-span-6 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-base font-bold text-slate-800">Course Outcome & Verification Rates</h3>
+            <p class="text-xs text-slate-500">Comparing self-reported placement against two-sided verified employer audit.</p>
+          </div>
+          <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Sector Benchmark</span>
+        </div>
+        <div class="h-64">
+          <canvas id="courseChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PS Core Section: Skill-Gap & Non-Placement Diagnostics -->
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-4 border-b border-slate-200">
+        <div>
+          <div class="flex items-center space-x-2">
+            <h3 class="text-lg font-bold text-gov-900">Skill-Gap & Non-Placement Diagnostics</h3>
+            <span class="bg-rose-100 text-rose-800 text-xs font-bold px-2 py-0.5 rounded">SIH26135 Explicit Deliverable</span>
+          </div>
+          <p class="text-xs text-slate-600 mt-0.5">Capturing WHY trainees were not placed and WHAT specific skill gaps they reported in follow-ups.</p>
+        </div>
+        <button onclick="loadSkillGaps()" class="text-xs text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-semibold px-3 py-1.5 rounded transition">
+          Refresh Diagnostic Feed
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Top Reasons for Non-Placement -->
+        <div>
+          <h4 class="text-sm font-bold text-slate-800 mb-3 flex items-center">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 mr-2"></span>
+            Top Root Causes for Non-Placement (WHY)
+          </h4>
+          <div id="reasons_container" class="space-y-3">
+            <div class="text-xs text-slate-400">Loading diagnostic reasons...</div>
+          </div>
+        </div>
+
+        <!-- Top Reported Skill Gaps -->
+        <div>
+          <h4 class="text-sm font-bold text-slate-800 mb-3 flex items-center">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 mr-2"></span>
+            Top Trainee-Reported Skill Deficits (WHAT)
+          </h4>
+          <div id="gaps_container" class="space-y-3">
+            <div class="text-xs text-slate-400">Loading reported skill gaps...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sector-wise Breakdown Tabs -->
+      <div class="mt-6 pt-4 border-t border-slate-100">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Sector-Specific Insights</h4>
+        <div id="sector_cards" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
+      </div>
+    </div>
+
+    <!-- Charts Row 2 & Explainable ML Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- District Geographic Breakdown -->
+      <div class="lg:col-span-5 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <h3 class="text-base font-bold text-slate-800 mb-1">Geographic Trainee Footprint</h3>
+        <p class="text-xs text-slate-500 mb-4">Distribution across urban, industrial, and rural Maharashtra districts.</p>
+        <div class="h-64 flex justify-center">
+          <canvas id="districtChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Explainable Machine Learning Layer (Scikit-learn LogisticRegression) -->
+      <div class="lg:col-span-7 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <div class="flex items-center space-x-2">
+              <h3 class="text-base font-bold text-gov-900">Explainable AI: Response Likelihood Model</h3>
+              <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded font-bold font-mono">LogisticRegression</span>
+            </div>
+            <p class="text-xs text-slate-500">Transparent scikit-learn weights explaining why a trainee is likely or unlikely to respond.</p>
+          </div>
+          <button onclick="trainML()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-1.5 rounded transition">
+            Train / Calibrate ML
+          </button>
+        </div>
+
+        <div id="ml_status_box" class="bg-indigo-50/70 p-3 rounded-lg border border-indigo-100 mb-4 text-xs">
+          <div class="flex justify-between items-center text-indigo-950 font-bold mb-1">
+            <span id="ml_status_title">Calibrating Model Status...</span>
+            <span id="ml_sample_badge" class="bg-indigo-200 text-indigo-900 px-2 py-0.5 rounded text-[11px]">-- samples</span>
+          </div>
+          <div id="ml_weights_list" class="space-y-1 text-slate-700 font-mono text-[11px]"></div>
+        </div>
+
+        <!-- Live Inference Sandbox -->
+        <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
+          <span class="text-xs font-bold text-slate-700 block mb-2">Interactive AI Inference Sandbox</span>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Sector</label>
+              <select id="pred_sector" class="w-full text-xs border rounded p-1 bg-white">
+                <option value="Automotive">Automotive</option>
+                <option value="Solar & Renewable">Solar & Renewable</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Retail & Logistics">Retail & Logistics</option>
+                <option value="Information Technology">Information Tech</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Geography</label>
+              <select id="pred_rural" class="w-full text-xs border rounded p-1 bg-white">
+                <option value="false">Urban / Semi-Urban</option>
+                <option value="true">Rural / Remote</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Channel</label>
+              <select id="pred_channel" class="w-full text-xs border rounded p-1 bg-white">
+                <option value="SMS">SMS Gateway</option>
+                <option value="WHATSAPP">WhatsApp API</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Prior Risk</label>
+              <input type="number" id="pred_risk" value="0.25" step="0.05" min="0.05" max="0.95" class="w-full text-xs border rounded p-1">
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <button onclick="runPredict()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium px-4 py-1.5 rounded transition">
+              Run Live Prediction &rarr;
+            </button>
+            <div id="pred_result" class="text-xs font-semibold text-indigo-700"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    Kshamata-Setu • SIH26135 • Team HexaCore • Smart India Hackathon 2026
+  </footer>
+
+  <script>
+    let tierChartInstance = null;
+    let courseChartInstance = null;
+    let districtChartInstance = null;
+
+    async function loadSummary() {
+      try {
+        const res = await fetch('/analytics/summary');
+        const data = await res.json();
+        
+        document.getElementById('kpi_total_trainees').innerText = data.total_trainees;
+        document.getElementById('kpi_response_rate').innerText = data.response_rate + '%';
+        document.getElementById('kpi_responses_sub').innerText = `${data.total_responses} of ${data.total_followups} contacted`;
+        document.getElementById('kpi_placement_rate').innerText = data.placement_rate + '%';
+
+        const e3 = data.evidence_tiers.E3_EMPLOYER_CONFIRMED || 0;
+        const e3Rate = data.total_responses > 0 ? ((e3 / data.total_responses) * 100).toFixed(1) : 0;
+        document.getElementById('kpi_e3_rate').innerText = e3Rate + '%';
+
+        renderTierChart(data.evidence_tiers);
+      } catch (e) {
+        console.error('Summary error:', e);
+      }
+    }
+
+    function renderTierChart(tiers) {
+      const ctx = document.getElementById('tierChart').getContext('2d');
+      if (tierChartInstance) tierChartInstance.destroy();
+
+      tierChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['E0: Unresolved', 'E1: Self-Reported', 'E3: Employer Confirmed', 'Disputed / Rejected'],
+          datasets: [{
+            label: 'Trainee Records',
+            data: [
+              tiers.E0_NONE || 0,
+              tiers.E1_SELF_REPORTED || 0,
+              tiers.E3_EMPLOYER_CONFIRMED || 0,
+              tiers.REJECTED_OR_DISPUTED || 0
+            ],
+            backgroundColor: [
+              '#94a3b8', // slate-400 for unresolved
+              '#8b5cf6', // purple-500 for self-reported
+              '#10b981', // emerald-500 for employer confirmed
+              '#f43f5e'  // rose-500 for disputed
+            ],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } } }
+        }
+      });
+    }
+
+    async function loadCourseAnalytics() {
+      try {
+        const res = await fetch('/analytics/by-course');
+        const courses = await res.json();
+        
+        const ctx = document.getElementById('courseChart').getContext('2d');
+        if (courseChartInstance) courseChartInstance.destroy();
+
+        courseChartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: courses.map(c => c.course_name.split(' ')[0] + '...'),
+            datasets: [
+              {
+                label: 'Self-Reported Placement (%)',
+                data: courses.map(c => c.placement_rate),
+                backgroundColor: '#c084fc',
+                borderRadius: 4
+              },
+              {
+                label: 'Employer-Verified (E3) (%)',
+                data: courses.map(c => c.employer_verified_rate),
+                backgroundColor: '#10b981',
+                borderRadius: 4
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true, max: 100 } }
+          }
+        });
+      } catch (e) {
+        console.error('Course analytics error:', e);
+      }
+    }
+
+    async function loadDistrictAnalytics() {
+      try {
+        const res = await fetch('/analytics/by-district');
+        const districts = await res.json();
+
+        const ctx = document.getElementById('districtChart').getContext('2d');
+        if (districtChartInstance) districtChartInstance.destroy();
+
+        districtChartInstance = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: districts.map(d => d.district),
+            datasets: [{
+              data: districts.map(d => d.trainee_count),
+              backgroundColor: ['#0f766e', '#0284c7', '#6366f1', '#a855f7', '#ec4899', '#f97316', '#eab308', '#84cc16', '#14b8a6', '#64748b']
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+          }
+        });
+      } catch (e) {
+        console.error('District analytics error:', e);
+      }
+    }
+
+    async function loadSkillGaps() {
+      try {
+        const res = await fetch('/analytics/skill-gaps');
+        const data = await res.json();
+
+        // Reasons
+        const rContainer = document.getElementById('reasons_container');
+        if (!data.top_non_placement_reasons.length) {
+          rContainer.innerHTML = '<p class="text-xs text-slate-400">No non-placement records submitted yet.</p>';
+        } else {
+          rContainer.innerHTML = data.top_non_placement_reasons.map(r => `
+            <div class="bg-slate-50 p-2.5 rounded border border-slate-100">
+              <div class="flex justify-between text-xs font-semibold text-slate-800 mb-1">
+                <span>${r.reason}</span>
+                <span class="text-rose-600 font-mono">${r.count} reported</span>
+              </div>
+              <div class="w-full bg-slate-200 rounded-full h-1.5">
+                <div class="bg-rose-500 h-1.5 rounded-full" style="width: ${Math.min(100, r.count * 20)}%"></div>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        // Gaps
+        const gContainer = document.getElementById('gaps_container');
+        if (!data.top_reported_skill_gaps.length) {
+          gContainer.innerHTML = '<p class="text-xs text-slate-400">No skill gaps reported yet.</p>';
+        } else {
+          gContainer.innerHTML = data.top_reported_skill_gaps.map(g => `
+            <div class="bg-slate-50 p-2.5 rounded border border-slate-100">
+              <div class="flex justify-between text-xs font-semibold text-slate-800 mb-1">
+                <span>${g.gap}</span>
+                <span class="text-amber-600 font-mono">${g.count} reported</span>
+              </div>
+              <div class="w-full bg-slate-200 rounded-full h-1.5">
+                <div class="bg-amber-500 h-1.5 rounded-full" style="width: ${Math.min(100, g.count * 20)}%"></div>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        // Sector breakdown
+        const sContainer = document.getElementById('sector_cards');
+        const sectors = Object.keys(data.sector_breakdown);
+        sContainer.innerHTML = sectors.slice(0, 3).map(s => {
+          const item = data.sector_breakdown[s];
+          const topReason = item.top_reasons[0]?.reason || 'N/A';
+          const topGap = item.top_skill_gaps[0]?.gap || 'N/A';
+          return `
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs">
+              <div class="font-bold text-slate-800 border-b pb-1 mb-2">${s}</div>
+              <div class="text-[11px] text-slate-500">Key Attrition:</div>
+              <div class="text-rose-700 font-medium truncate mb-1.5" title="${topReason}">• ${topReason}</div>
+              <div class="text-[11px] text-slate-500">Key Deficit:</div>
+              <div class="text-amber-800 font-medium truncate" title="${topGap}">• ${topGap}</div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (e) {
+        console.error('Skill gaps error:', e);
+      }
+    }
+
+    async function trainML() {
+      try {
+        const res = await fetch('/ml/train', { method: 'POST' });
+        const data = await res.json();
+        
+        document.getElementById('ml_status_title').innerText = data.status === 'success' 
+          ? `Trained: ${data.accuracy_score ? (data.accuracy_score*100).toFixed(0)+'%' : ''} Accuracy`
+          : 'Status: Insufficient Data';
+        document.getElementById('ml_sample_badge').innerText = `${data.sample_count} samples`;
+
+        const listDiv = document.getElementById('ml_weights_list');
+        if (data.feature_explanations && data.feature_explanations.length) {
+          listDiv.innerHTML = data.feature_explanations.map(e => `<div>• ${e}</div>`).join('');
+        } else {
+          listDiv.innerHTML = `<div class="text-slate-500">${data.message}</div>`;
+        }
+      } catch (e) {
+        console.error('ML train error:', e);
+      }
+    }
+
+    async function runPredict() {
+      const sector = document.getElementById('pred_sector').value;
+      const isRural = document.getElementById('pred_rural').value === 'true';
+      const channel = document.getElementById('pred_channel').value;
+      const priorRisk = parseFloat(document.getElementById('pred_risk').value);
+
+      try {
+        const res = await fetch('/ml/predict', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            sector: sector,
+            is_rural: isRural,
+            channel: channel,
+            prior_risk: priorRisk
+          })
+        });
+        const data = await res.json();
+        const pct = (data.predicted_response_likelihood * 100).toFixed(1);
+        document.getElementById('pred_result').innerText = `Likelihood: ${pct}% (${data.will_respond_likely ? 'Likely to Respond' : 'High Non-Response Risk'})`;
+      } catch (e) {
+        console.error('Predict error:', e);
+      }
+    }
+
+    window.onload = () => {
+      loadSummary();
+      loadCourseAnalytics();
+      loadDistrictAnalytics();
+      loadSkillGaps();
+      trainML();
+    };
+  </script>
+</body>
+</html>

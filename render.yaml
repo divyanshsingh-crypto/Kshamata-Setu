@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: kshamata-setu
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python seed_data.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.8
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        value: sqlite:///./kshamata_setu.db
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SALT_SECRET
+        value: kshamata_audit_salt_2026_maharashtra_secure
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 1440

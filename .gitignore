@@ -1,0 +1,12 @@
+.env
+*.db
+__pycache__/
+*.pyc
+*.pkl
+venv/
+.pytest_cache/
+*.log
+.DS_Store
+dist/
+build/
+kshamata_setu.zip
